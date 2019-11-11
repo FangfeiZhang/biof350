@@ -1,0 +1,4 @@
+kernel size
+color
+file
+threshold
