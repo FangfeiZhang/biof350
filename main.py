@@ -20,9 +20,13 @@ cv2.imwrite("bw.png", cv2.bitwise_not(img_bw))
 """
 image_dir = "original/"
 save_dir = "save/"
-Kernel = 10
+Kernel = 20
 threshold = -1
-
+ANCHOR_X = -5000
+ANCHOR_Y = -2000
+Test_number = 4
+go = True  
+run = False
 #close files and save file
 def Convert(file, kernel, in_dir, out_dir, dilation = False, size = 0, threshold = -1):
     Kernel = numpy.ones((kernel, kernel), numpy.uint8)
@@ -49,6 +53,9 @@ saveContent = [i for i in getoutput("ls " + save_dir).split()]
 for i in origContent:
     Convert(i, Kernel, image_dir, save_dir)
 """
+if(go == True):
+    for i in range(Test_number):
+        Convert(origContent[i], Kernel, image_dir, save_dir)
 #Convert(content[2], Kernel, image_dir, save_dir)
 
 
@@ -83,26 +90,26 @@ def floodFill(x, y, z, color, image):
 
 def canvasFill(event, z, color, image):
     global origContent, save_dir
-    temp = floodFill(event.x, event.y, z, color, image)
+    temp = floodFill(event.x-ANCHOR_X, event.y-ANCHOR_Y, z, color, image)
     for i in range (len(temp)):
         temp[i].save(save_dir+origContent[i])
     print("done")
 
-
-imageStack = [Image.open(save_dir +fn).convert("RGB") for fn in saveContent]
-
-
-app = Tk()
-app.resizable(True, True)
-canvas = Canvas(app)
-canvas.pack()
-canvas['width'], canvas['height'] = imageStack[0].size
-pimg = ImageTk.PhotoImage(image=imageStack[0])
-canvas.create_image(0, 0, anchor='nw', image = pimg)
-
-canvas.bind("<Button-1>", lambda e : canvasFill(e, 0, (255, 0, 125), imageStack))
+if run == True:
+    imageStack = [Image.open(save_dir +fn).convert("RGB") for fn in saveContent]
 
 
-app.mainloop()
+    app = Tk()
+    app.resizable(True, True)
+    canvas = Canvas(app)
+    canvas.pack()
+    canvas['width'], canvas['height'] = imageStack[0].size
+    pimg = ImageTk.PhotoImage(image=imageStack[0])
+    canvas.create_image(ANCHOR_X, ANCHOR_Y, anchor='nw', image = pimg)
+
+    canvas.bind("<Button-1>", lambda e : canvasFill(e, 0, (255, 0, 125), imageStack))
+
+
+    app.mainloop()
 
 #print (content)
